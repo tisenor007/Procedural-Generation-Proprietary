@@ -152,9 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84e5f731451c58f4cb4468ad9ce57f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSizeX: 50
-  mapSizeZ: 50
-  cube: {fileID: 5765383557842758798, guid: c72f36439209abb4daf30fa81d74d30d, type: 3}
+  mapSizeX: 12
+  mapSizeZ: 12
 --- !u!4 &134734049
 Transform:
   m_ObjectHideFlags: 0

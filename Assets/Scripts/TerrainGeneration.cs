@@ -6,10 +6,11 @@ public class TerrainGeneration : MonoBehaviour
 {
     public int mapSizeX;
     public int mapSizeZ;
-    public GameObject cube;
+    private GameObject[] cubes;
     // Start is called before the first frame update
     void Start()
     {
+        cubes = new GameObject[mapSizeX * mapSizeZ];
         GenerateTerrain();
     }
 
@@ -20,13 +21,27 @@ public class TerrainGeneration : MonoBehaviour
     }
     public void GenerateTerrain()
     {
-        for (int z = 0; z <= mapSizeZ; z++)
+
+        //for (int z = 0; z <= mapSizeZ; z++)
+        //{
+        //    for (int x = 0; x <= mapSizeX; x++)
+        //    {
+        //        Instantiate(cube, new Vector3(x, PerlinNoise(Time.time, 0.1f * freq) * amp, z), Quaternion.identity);
+        //    }
+        //}
+        for (int i = 0; i <= mapSizeZ * mapSizeX - 1; i++)
         {
-            for (int x = 0; x <= mapSizeX; x++)
+            for (int z = 0; z <= mapSizeZ; z++)
             {
-                Instantiate(cube, new Vector3(x, 0, z), Quaternion.identity);
+                for (int x = 0; x <= mapSizeX; x++)
+                {
+                    float y = Mathf.PerlinNoise(x * .06f, z * .06f);
+                    cubes[i] = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    cubes[i].transform.position = new Vector3(x, y, z);
+                }
             }
         }
+        Debug.Log(cubes.Length);
     }
     public void UpdateTerrain()
     {
@@ -38,4 +53,5 @@ public class TerrainGeneration : MonoBehaviour
         //    }
         //}
     }
+   
 }
