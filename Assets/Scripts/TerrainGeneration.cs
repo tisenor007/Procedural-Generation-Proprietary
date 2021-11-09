@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TerrainGeneration : MonoBehaviour
 {
@@ -13,22 +14,18 @@ public class TerrainGeneration : MonoBehaviour
     public float amp;
     public int chunkSpacing;
     public GameObject prefab;
+    //public Text 
     private List<GameObject> cubes = new List<GameObject>();
     private GameObject map;
     // Start is called before the first frame update
     void Start()
     {
         GenerateTerrain();
-        
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            GenerateTerrain();
-        }
     }
    
     public void GenerateTerrain()
@@ -48,6 +45,11 @@ public class TerrainGeneration : MonoBehaviour
         }
 
         foreach (GameObject cube in cubes) { if (cube != null) { cube.transform.parent = map.transform; } }
+    }
+
+    public void AdjustMapSizeX(int value)
+    {
+        mapSizeX = value;
     }
   
    
