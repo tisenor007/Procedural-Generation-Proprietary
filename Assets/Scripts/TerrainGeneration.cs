@@ -6,42 +6,39 @@ public class TerrainGeneration : MonoBehaviour
 {
     public int mapSizeX;
     public int mapSizeZ;
-    private GameObject[] cubes;
+    public GameObject prefab;
+    private List<GameObject> cubes = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
     {
-        cubes = new GameObject[mapSizeX * mapSizeZ];
         GenerateTerrain();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        UpdateTerrain();
+        if (Input.GetMouseButtonDown(0))
+        {
+            GenerateTerrain();
+        }
     }
+   
     public void GenerateTerrain()
     {
-
-        //for (int z = 0; z <= mapSizeZ; z++)
-        //{
-        //    for (int x = 0; x <= mapSizeX; x++)
-        //    {
-        //        Instantiate(cube, new Vector3(x, PerlinNoise(Time.time, 0.1f * freq) * amp, z), Quaternion.identity);
-        //    }
-        //}
-        for (int i = 0; i <= mapSizeZ * mapSizeX - 1; i++)
+        foreach (GameObject cube in cubes) { Destroy(cube); }
+        for (int z = 0; z < mapSizeZ; z++)
         {
-            for (int z = 0; z <= mapSizeZ; z++)
+            for (int x = 0; x < mapSizeX; x++)
             {
-                for (int x = 0; x <= mapSizeX; x++)
-                {
-                    float y = Mathf.PerlinNoise(x * .06f, z * .06f);
-                    cubes[i] = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    cubes[i].transform.position = new Vector3(x, y, z);
-                }
+                float y = Mathf.PerlinNoise(x * (UnityEngine.Random.Range(0.06f, 0.5f)), z * (UnityEngine.Random.Range(0.06f, 0.5f)));
+                cubes.Add(Instantiate(prefab, new Vector3(x * 2, y, z * 2), Quaternion.identity));//GameObject.CreatePrimitive(PrimitiveType.Cube);
+                //foreach (GameObject cube in cubes) { cube.transform.GetChild(0).gameObject.SetActive(false); }
             }
         }
-        Debug.Log(cubes.Length);
+        
+
+        Debug.Log(mapSizeZ * mapSizeX);
     }
     public void UpdateTerrain()
     {
@@ -52,6 +49,7 @@ public class TerrainGeneration : MonoBehaviour
         //        squares[x, z].transform.position = new Vector3(x, 0, z);
         //    }
         //}
+        
     }
    
 }

@@ -152,8 +152,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84e5f731451c58f4cb4468ad9ce57f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSizeX: 12
-  mapSizeZ: 12
+  mapSizeX: 25
+  mapSizeZ: 25
+  prefab: {fileID: 7216363764509378947, guid: 5b3ab668c7baf4543a92cb7a90000c99, type: 3}
 --- !u!4 &134734049
 Transform:
   m_ObjectHideFlags: 0
