@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class TerrainGeneration : MonoBehaviour
 {
-    [Header("No bigger than 35 for each, could break game")]
+    //VARIABLES:
+    [Header("No bigger than 35 for each, higher could overload game")]
     public int mapSizeX;
     public int mapSizeZ;
     [Header("Between 0.01 and 0.1 for better results")]
@@ -21,7 +22,11 @@ public class TerrainGeneration : MonoBehaviour
     public Text blockSpacingTxt;
     private List<GameObject> cubes = new List<GameObject>();
     private GameObject map;
+    private float maxDepth;
+    private bool maploaded;
+
     // Start is called before the first frame update
+    //Generates terrain on start (self explanitory)
     void Start()
     {
         GenerateTerrain();
@@ -30,31 +35,46 @@ public class TerrainGeneration : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        //keeps text updated
         mapXTxt.text = "New Map X: " + mapSizeX;
         mapZTxt.text = "New Map Z: " + mapSizeZ;
-        freqTxt.text = "New Frequency: " + freq;
-        ampTxt.text = "New Amp: " + amp;
+        freqTxt.text = "New Hill Variation: " + freq;
+        ampTxt.text = "New Hill Heights: " + amp;
         blockSpacingTxt.text = "New Block Spacing: " + blockSpacing;
     }
    
     public void GenerateTerrain()
     {
-       
+        maploaded = false;
+        //resets everything when new map is generated
         Destroy(map);
-        foreach (GameObject cube in cubes) { Destroy(cube); }
+        for (int i = 0; i < cubes.Count; i++) { Destroy(cubes[i]); cubes[i] = null; }
         map = new GameObject("Map");
-
         for (int c = 0; c <= layers.Length - 1; c++)
         {
+            //checks where layer "is" to generated it there
             if (layers[c].name == "Grass") { GenerateBlockLayer(c); }
             if (layers[c].name == "Dirt") { GenerateBlockLayer(c); }
             if (layers[c].name == "Stone") { GenerateBlockLayer(c); }
             if (layers[c].name == "Bedrock") { GenerateBlockLayer(c); }
         }
-        foreach (GameObject cube in cubes) { if (cube != null) { cube.transform.parent = map.transform; } }
-        freeStorage();
+        //finds lowest point then fills map to lowest point
+        maxDepth = FindLowestPoint();
+        FillChunkBottom();
+        foreach (GameObject cube in cubes) {
+            if (cube != null) {
+                //adds all blocks to a parent object for easy moving...
+                cube.transform.parent = map.transform;
+                for (int i = 0; i< cube.transform.childCount; i++) { cube.transform.GetChild(i).gameObject.SetActive(true); }
+            } 
+        }
+        maploaded = true;
+        //will not do backface culling until all blocks are generated
+        //the bool is just an extra layer of protection
+        if (maploaded == true) { FreeRendering(); }
     }
+
+    //generates a layer of blockentered in
     public void GenerateBlockLayer(int layerNumber)
     {
         for (int z = 0; z < mapSizeZ; z++)
@@ -62,23 +82,63 @@ public class TerrainGeneration : MonoBehaviour
             for (int x = 0; x < mapSizeX; x++)
             {
                 float y = Mathf.PerlinNoise(x * freq, z * freq) * amp;
-                cubes.Add(Instantiate(layers[layerNumber], new Vector3(x * blockSpacing, y - layerNumber, z * blockSpacing), Quaternion.identity));//GameObject.CreatePrimitive(PrimitiveType.Cube);
-                //foreach (GameObject cube in cubes) { cube.transform.GetChild(0).gameObject.SetActive(false); }
+                cubes.Add(Instantiate(layers[layerNumber], new Vector3(x * blockSpacing, (int)y - layerNumber, z * blockSpacing), Quaternion.identity));
             }
         }
     }
-    public void freeStorage()
+
+    //Fills in below of map, to the lowest point
+    public void FillChunkBottom()
     {
         for (int i = 0; i < cubes.Count; i++)
         {
             if (cubes[i] != null)
             {
-                if (isBlockUp(cubes[i])) { cubes[i].transform.GetChild(4).gameObject.SetActive(false); }
-                if (isBlockDown(cubes[i])) { cubes[i].transform.GetChild(5).gameObject.SetActive(false); }
+                if (cubes[i].name == layers[layers.Length-1].name + "(Clone)" && cubes[i].transform.position.y > maxDepth)
+                {
+                    cubes.Add(Instantiate(layers[layers.Length-1], new Vector3(cubes[i].transform.position.x, cubes[i].transform.position.y - 1, cubes[i].transform.position.z), Quaternion.identity));
+                    
+                }
             }
         }
     }
 
+    //Finds Lowest point of Generated map
+    public float FindLowestPoint()
+    {
+        float lowestPoint = 20;
+        for (int i = 0; i < cubes.Count; i++)
+        {
+            if (cubes[i] != null)
+            {
+                if (cubes[i].transform.position.y <= lowestPoint)
+                {
+                    lowestPoint = cubes[i].transform.position.y;
+                }
+            }
+        }
+        return lowestPoint;
+    }
+
+    //MAKES LOAD TIME SLOWER BUT RENDERING FASTER
+    public void FreeRendering()
+    {
+        //manual back-face culling for performance enhancing 
+        for (int i = 0; i < cubes.Count; i++)
+        {
+            if (cubes[i] != null)
+            {
+                if (cubes[i].name != layers[0].name){if (isBlockUp(cubes[i])) { cubes[i].transform.GetChild(4).gameObject.SetActive(false); }}
+                if (isBlockDown(cubes[i])) { cubes[i].transform.GetChild(5).gameObject.SetActive(false); }
+                if (isBlockRight(cubes[i])) { cubes[i].transform.GetChild(3).gameObject.SetActive(false); }
+                if (isBlockLeft(cubes[i])) { cubes[i].transform.GetChild(2).gameObject.SetActive(false); }
+                if (isBlockFront(cubes[i])) { cubes[i].transform.GetChild(1).gameObject.SetActive(false); }
+                if (isBlockBehind(cubes[i])) { cubes[i].transform.GetChild(0).gameObject.SetActive(false); }
+            }
+        }
+    }
+
+    //checks if a block is above said block
     public bool isBlockUp(GameObject cube)
     {
         for (int i = 0; i < cubes.Count; i++)
@@ -92,6 +152,8 @@ public class TerrainGeneration : MonoBehaviour
         }
         return false;
     }
+
+    //checks if a block is below said block
     public bool isBlockDown(GameObject cube)
     {
         for (int i = 0; i < cubes.Count; i++)
@@ -104,7 +166,60 @@ public class TerrainGeneration : MonoBehaviour
         return false;
     }
 
+    //checks if a block is to the left of said block
+    public bool isBlockLeft(GameObject cube)
+    {
+        for (int i = 0; i < cubes.Count; i++)
+        {
+            if (cubes[i] != null && cubes[i].transform.position == new Vector3(cube.transform.position.x-1, cube.transform.position.y, cube.transform.position.z))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    //checks if a block is to the right of said block
+    public bool isBlockRight(GameObject cube)
+    {
+        for (int i = 0; i < cubes.Count; i++)
+        {
+            if (cubes[i] != null && cubes[i].transform.position == new Vector3(cube.transform.position.x + 1, cube.transform.position.y, cube.transform.position.z))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //checks if a block is infront of said block
+    public bool isBlockFront(GameObject cube)
+    {
+        for (int i = 0; i < cubes.Count; i++)
+        {
+            if (cubes[i] != null && cubes[i].transform.position == new Vector3(cube.transform.position.x, cube.transform.position.y, cube.transform.position.z + 1))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //checks if a block behind of said block
+    public bool isBlockBehind(GameObject cube)
+    {
+        for (int i = 0; i < cubes.Count; i++)
+        {
+            if (cubes[i] != null && cubes[i].transform.position == new Vector3(cube.transform.position.x, cube.transform.position.y, cube.transform.position.z - 1))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    //Button Methods
     public void AdjustMapSizeX(float value)
     {
         mapSizeX = (int)value;
@@ -125,6 +240,4 @@ public class TerrainGeneration : MonoBehaviour
     {
         blockSpacing = (int)value;
     }
-
-
 }
