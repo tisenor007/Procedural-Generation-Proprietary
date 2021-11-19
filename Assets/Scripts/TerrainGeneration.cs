@@ -24,6 +24,7 @@ public class TerrainGeneration : MonoBehaviour
     private GameObject map;
     private float maxDepth;
     private bool maploaded;
+    private float y;
 
     // Start is called before the first frame update
     //Generates terrain on start (self explanitory)
@@ -50,13 +51,9 @@ public class TerrainGeneration : MonoBehaviour
         Destroy(map);
         for (int i = 0; i < cubes.Count; i++) { Destroy(cubes[i]); cubes[i] = null; }
         map = new GameObject("Map");
-        for (int c = 0; c <= layers.Length - 1; c++)
+        for (int c = 0; c < layers.Length; c++)
         {
-            //checks where layer "is" to generated it there
-            if (layers[c].name == "Grass") { GenerateBlockLayer(c); }
-            if (layers[c].name == "Dirt") { GenerateBlockLayer(c); }
-            if (layers[c].name == "Stone") { GenerateBlockLayer(c); }
-            if (layers[c].name == "Bedrock") { GenerateBlockLayer(c); }
+            GenerateBlockLayer(c);
         }
         //finds lowest point then fills map to lowest point
         maxDepth = FindLowestPoint();
@@ -77,12 +74,23 @@ public class TerrainGeneration : MonoBehaviour
     //generates a layer of blockentered in
     public void GenerateBlockLayer(int layerNumber)
     {
+        //float y;
         for (int z = 0; z < mapSizeZ; z++)
         {
             for (int x = 0; x < mapSizeX; x++)
             {
-                float y = Mathf.PerlinNoise(x * freq, z * freq) * amp;
+                y = Mathf.PerlinNoise(x * freq, z * freq) * amp;
                 cubes.Add(Instantiate(layers[layerNumber], new Vector3(x * blockSpacing, (int)y - layerNumber, z * blockSpacing), Quaternion.identity));
+                foreach (GameObject cube in cubes)
+                {
+                    if (cube! != null)
+                    {
+                        if (cube.transform.position == new Vector3(x * blockSpacing, (int)y - layerNumber, z * blockSpacing))
+                        {
+                            cube.name = cube.name + (layerNumber + 1).ToString();
+                        }
+                    }
+                }
             }
         }
     }
@@ -94,10 +102,19 @@ public class TerrainGeneration : MonoBehaviour
         {
             if (cubes[i] != null)
             {
-                if (cubes[i].name == layers[layers.Length-1].name + "(Clone)" && cubes[i].transform.position.y > maxDepth)
+                if (cubes[i].name == layers[layers.Length-1].name + "(Clone)" + (layers.Length).ToString() && cubes[i].transform.position.y > maxDepth)
                 {
                     cubes.Add(Instantiate(layers[layers.Length-1], new Vector3(cubes[i].transform.position.x, cubes[i].transform.position.y - 1, cubes[i].transform.position.z), Quaternion.identity));
-                    
+                    foreach (GameObject cube in cubes)
+                    {
+                        if (cube != null)
+                        {
+                            if (cube.transform.position == new Vector3(cubes[i].transform.position.x, cubes[i].transform.position.y - 1, cubes[i].transform.position.z))
+                            {
+                                cube.name = cube.name + (layers.Length).ToString();
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -299,17 +299,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84e5f731451c58f4cb4468ad9ce57f4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSizeX: 20
-  mapSizeZ: 20
+  mapSizeX: 10
+  mapSizeZ: 10
   freq: 0.08
   amp: 19
   blockSpacing: 1
   layers:
+  - {fileID: 816003328155709068, guid: 8bea5f302cc42f6439013c7c7ce7ea94, type: 3}
+  - {fileID: 8642646200144543657, guid: a4b3ab63a9a544e4abc13640becd68ce, type: 3}
+  - {fileID: 8642646200144543657, guid: a4b3ab63a9a544e4abc13640becd68ce, type: 3}
+  - {fileID: 8642646200144543657, guid: a4b3ab63a9a544e4abc13640becd68ce, type: 3}
   - {fileID: 7216363764509378947, guid: 5b3ab668c7baf4543a92cb7a90000c99, type: 3}
-  - {fileID: 8642646200144543657, guid: a4b3ab63a9a544e4abc13640becd68ce, type: 3}
-  - {fileID: 8642646200144543657, guid: a4b3ab63a9a544e4abc13640becd68ce, type: 3}
-  - {fileID: 7541648152690149200, guid: b9e7a880996a0be4f9f747d801fb1d79, type: 3}
-  - {fileID: 7541648152690149200, guid: b9e7a880996a0be4f9f747d801fb1d79, type: 3}
   - {fileID: 816003328155709068, guid: 8bea5f302cc42f6439013c7c7ce7ea94, type: 3}
   mapXTxt: {fileID: 1535362802}
   mapZTxt: {fileID: 179200286}
