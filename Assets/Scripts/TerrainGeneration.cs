@@ -20,6 +20,7 @@ public class TerrainGeneration : MonoBehaviour
     public Text freqTxt;
     public Text ampTxt;
     public Text blockSpacingTxt;
+    public bool backfaceCulling;
     private List<GameObject> cubes = new List<GameObject>();
     private GameObject map;
     private float maxDepth;
@@ -68,7 +69,10 @@ public class TerrainGeneration : MonoBehaviour
         maploaded = true;
         //will not do backface culling until all blocks are generated
         //the bool is just an extra layer of protection
-        if (maploaded == true) { FreeRendering(); }
+        if (maploaded == true && backfaceCulling == true) 
+        { 
+            FreeRendering(); 
+        }
     }
 
     //generates a layer of blockentered in
